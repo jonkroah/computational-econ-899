@@ -35,26 +35,24 @@ function Bellman(prim::Primitives,res::Results)
     @unpack k_grid, β, δ, θ, nk, z_space, nz, Π = prim #unpack model primitives
     v_next = zeros(nk, nz) #next guess of value function to fill
 
-    for z_index = 1:nz #iterating over productivity states (z)
-        for k_index = 1:nk #iterating over values of k and solving for optimal k'(k)
-            k = k_grid[k_index] #value of k
-            candidate_max = -Inf #bad candidate max
-            budget = z_space[z_index]*k^θ + (1-δ)*k #budget--add productivity shock
+    for z_index = 1:nz, k_index = 1:nk #iterating over values of z and k and solving for optimal k'(k,z)
+        k = k_grid[k_index] #value of k
+        candidate_max = -Inf #bad candidate max
+        budget = z_space[z_index]*k^θ + (1-δ)*k #budget--add productivity shock
 
-            for kp_index in 1:nk #loop over possible selections of k', exploiting monotonicity of policy function
-                c = budget - k_grid[kp_index] #consumption given k' selection
-                if c>0 #check for positivity
-                    #compute expected value:
-                    val = log(c) + β*(Π[z_index, 1]*val_func[kp_index, 1] + Π[z_index, 2]*val_func[kp_index, 2])
-                    if val>candidate_max #check for new max value
-                        candidate_max = val #update max value
-                        res.pol_func[k_index, z_index] = k_grid[kp_index] #update policy function
-                    end
+        for kp_index in 1:nk #loop over possible selections of k', exploiting monotonicity of policy function
+            c = budget - k_grid[kp_index] #consumption given k' selection
+            if c>0 #check for positivity
+                #compute expected value:
+                val = log(c) + β*(Π[z_index, 1]*val_func[kp_index, 1] + Π[z_index, 2]*val_func[kp_index, 2])
+                if val>candidate_max #check for new max value
+                    candidate_max = val #update max value
+                    res.pol_func[k_index, z_index] = k_grid[kp_index] #update policy function
                 end
             end
-            v_next[k_index, z_index] = candidate_max #update value function for given k,z
-        end #end loop over values of k
-    end #end loop over Markov chain states
+        end
+        v_next[k_index, z_index] = candidate_max #update value function for given k,z
+    end #end loop over values of z and k
     v_next #return next guess of value function
 end
 
