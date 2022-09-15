@@ -1,6 +1,11 @@
-using Parameters, Plots #import the libraries we want
-cd("C:/Users/jgkro/Documents/GitHub/computational-econ-899/PS01/Julia")
-include("02Growth_model_PS01.jl") #import the functions that solve our growth model
+using Distributed # parallel processing package
+addprocs(2)
+
+@everywhere using Parameters, Plots, SharedArrays #import the libraries we want
+
+cd("C:/Users/jgkro/Documents/GitHub/computational-econ-899/PS01/Julia/parallelized")
+
+@everywhere include("02Growth_model_PS01_Parallel.jl") #import the functions that solve our growth model
 
 prim, res = Initialize() #initialize primitive and results structs
 @time Solve_model(prim, res) #solve the model!
