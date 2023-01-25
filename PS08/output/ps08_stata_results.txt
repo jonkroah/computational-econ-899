@@ -1,0 +1,41 @@
+		(1)
+VARIABLES	LABELS	Logit
+		
+i_large_loan	i_large_loan	0.872***
+		(0.075)
+i_medium_loan	i_medium_loan	0.532***
+		(0.070)
+rate_spread	Mortgage Interest Rate Spread at Origination (Percent)	0.604***
+		(0.061)
+i_refinance	i_refinance	0.163***
+		(0.060)
+age_r	X74R: Age at last birthday | Respondent	0.877***
+		(0.208)
+cltv	Combined LTV	-0.061
+		(0.179)
+dti	Mortgage debt to income	0.227
+		(0.169)
+cu	Credit Union	1.011***
+		(0.177)
+first_mort_r	Flag Indicating First Mortgage in Credit File | Respondent	0.335***
+		(0.082)
+score_0	FICO score at origination	-0.287***
+		(0.060)
+score_1	FICO Score (loan age = 1)	0.194***
+		(0.060)
+i_FHA	i_FHA	0.765***
+		(0.059)
+i_open_year2	open_year==  2014.0000	1.154***
+		(0.090)
+i_open_year3	open_year==  2015.0000	0.771***
+		(0.091)
+i_open_year4	open_year==  2016.0000	0.378***
+		(0.096)
+i_open_year5	open_year==  2017.0000	0.244**
+		(0.102)
+Constant	Constant	-6.083***
+		(0.579)
+		
+Observations		16,355
+Standard errors in parentheses		
+*** p<0.01, ** p<0.05, * p<0.10		

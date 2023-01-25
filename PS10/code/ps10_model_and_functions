@@ -1,0 +1,69 @@
+using CSV, DataFrames, LinearAlgebra, Parameters, Plots, Optim
+cd("/Users/jonkroah/Documents/GitHub/computational-econ-899/PS10")
+
+# import characteristics data
+df_demand = DataFrame(CSV.File("data/Car_demand_characteristics_spec1.csv"))
+
+# import instruments data
+# ...
+
+# import income data
+df_income = DataFrame(CSV.File("data/Simulated_type_distribution.csv"))
+
+# function to compute choice probabilities
+# Inputs:
+#       λ_p:    random coefficients parameter
+#       δ_jt:   vector of mean utilities 
+#       p_jt:   vector of prices
+#       y_r:      vector of incomes
+function choice_probs(λ_p::Float64, δ_jt::Vector{Float64}, p_jt::Vector{Float64}, y_r::Vector{Float64})
+    # Get number of individuals
+    R = length(y_r)
+    
+    # Calculate random utility component: μ_rjt
+    μ_rjt           = λ_p .* p_jt .* y_r'
+    exp_δ_plus_μ    = exp.(δ_jt .+ μ_rjt)
+
+    # Numerators: exp(δ_jt + μ_rjt)
+    temp1 = hcat(
+        select(df_demand, [:Model_id, :Year]),
+        DataFrame(exp_δ_plus_μ, :auto)
+    )
+
+    # Denominators: first, sum exp(δ_jt + μ_rjt) across j, within each market t (Year)
+    temp2 = combine(
+        groupby(temp1, :Year),
+        propertynames(temp1[!, 3:102]) .=> sum;
+        renamecols = true
+    )
+
+    temp3 = leftjoin(
+        select(df_demand, [:Model_id, :Year]),
+        temp2,
+        on=:Year
+    )
+
+    # Compute choice probabilities for each person r,
+    #   then integrate over persons r = 1, ..., R
+    numerators = Matrix(temp1[!, 3:102])
+    denominators = Matrix(temp3[!, 3:102]) .+ 1
+
+    σ_jt = (1 / R) .* sum(numerators ./ denominators, dims=2)
+
+    return σ_jt
+end
+
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#   WRITE OUT PSEUDO-CODE FOR THE FULL BLP ALGORITHM
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+# Function to invert market shares using BLP contraction mapping
+# Step 1: function that applies contraction mapping once
+#       Input: current guess for δ_jt (vector)
+#       Output: updated guess for δ_jt (vector)
+# Step 2: function to iterate until convergence
+
+
+# Function to invert market shares using Newton algorithm
+# Step 1: function that applies algorithm once
+# Step 2: function to iterate until convergence
